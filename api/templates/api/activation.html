@@ -1,0 +1,28 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %} Account activation on {{ site_name }}{% endblocktrans %}
+{% endblock subject %}
+
+{% block text_body %}
+{% blocktrans %} You're receiving this email because you need to finish the activation process on {{ site_name }}.{% endblocktrans %}
+
+{% trans "Please click the following button to activate your account:" %}
+
+<a href="{{ protocol }}://{{ domain }}/api/auth/users/activation/{{ uid }}/{{ token }}/" 
+   style="padding: 10px 20px; background-color: red; color: white; text-decoration: none;">Activate Account</a>
+
+{% blocktrans %}If you face difficulties with account activation, kindly contact us at: contact@ubaid.com{% endblocktrans %}
+{% endblock text_body %}
+
+{% block html_body %}
+<p>{% blocktrans %} You're receiving this email because you need to finish the activation process on {{ site_name }}.{% endblocktrans %}</p>
+
+<p style="margin-bottom:100px">
+    <a href="{{ protocol }}://{{ domain }}/api/auth/users/activation/{{ uid }}/{{ token }}/" 
+       style="display: inline-block; padding: 10px 20px; background-color: red; color: white; text-decoration: none;">Activate Account</a>
+</p>
+
+<i>{% blocktrans %}If you face difficulties with account activation, kindly contact us at: contact@ubaid.com{% endblocktrans %}</i>
+
+{% endblock html_body %}
