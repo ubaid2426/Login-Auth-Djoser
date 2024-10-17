@@ -8,7 +8,7 @@ class UserCreateSerializer(UserCreateSerializer):
         
     def create(self, validated_data):
         user = super().create(validated_data)
-        # Generate token and uuid logic here
+        # Generate token and uuid logic here so that
         return {
             'uid': user.id,  # Assuming user.id is your UUID
             'token': user.activation_token,  # Make sure to generate this in your user model 
