@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-h(87x(+08ulhszb(4ht=8+2o^%w89*y&y*#8m+-xr$o%r5%p='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2', '198.168.1.2']
+# ALLOWED_HOSTS = [any_host]
 
 
 # Application definition
@@ -200,7 +201,7 @@ DJOSER = {
         'activation': 'api.email.ActivationEmail',
         'confirmation': 'api.email.ConfirmationEmail',
         'password_reset': 'api.email.PasswordResetEmail',
-        'password_changed_confirmation': 'api.email.PasswordChangedConfirmationEmail',
+        # 'password_changed': 'api.email.PasswordChangedConfirmationEmail',
     },
 
 
@@ -208,8 +209,10 @@ DJOSER = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    # "https://example.com",
-    # "https://sub.example.com",
-    "http://localhost:49951/",   #frotend which port run add here
+    "http://localhost:61958/",   #frotend which port run add here
     "http://127.0.0.1:9000",
+     "http://192.168.1.100",   # Use your machine's local IP address
+    "http://198.168.1.2",
+    "http://localhost:59544/",
+    
 ]
