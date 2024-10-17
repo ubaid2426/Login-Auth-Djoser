@@ -11,7 +11,7 @@ class UserCreateSerializer(UserCreateSerializer):
         # Generate token and uuid logic here
         return {
             'uid': user.id,  # Assuming user.id is your UUID
-            'token': user.activation_token,  # Make sure to generate this in your user model
+            'token': user.activation_token,  # Make sure to generate this in your user model 
         }     
 
       

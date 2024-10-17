@@ -74,9 +74,6 @@ def get_user(self, uid, token):
 
 
 
-
-
-
 # class CustomPasswordResetConfirmView(APIView):
 #     def post(self, request, uidb64, token):
 #         try:
