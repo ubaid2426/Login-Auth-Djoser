@@ -216,6 +216,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:9000",
      "http://192.168.1.100",   # Use your machine's local IP address
     "http://198.168.1.2",
-    "http://localhost:59544/",
+    "http://localhost:51114/",
     
 ]
