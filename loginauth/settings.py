@@ -16,7 +16,12 @@ from datetime import timedelta
 import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR = Path(__file__).resolve().parent.parent
+# STATIC_DIR=os.path.join(BASE_DIR,'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -41,8 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-      'djoser',
-      "api",
+    'djoser',
+    # 'corsheaders',
+    "api",
+    "chatbot",
 ]
 
 MIDDLEWARE = [
@@ -50,10 +57,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     # "django.middleware.common.CommonMiddleware",
 ]
 
@@ -62,7 +70,9 @@ ROOT_URLCONF = 'loginauth.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR/ 'api'/ 'template',
+             ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,6 +142,8 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
 
 
@@ -149,7 +161,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'api.User'
+# AUTH_USER_MODEL = 'api.User'
 
 # JWT Configuration
 REST_FRAMEWORK = {
@@ -165,15 +177,17 @@ REST_FRAMEWORK = {
 
 
 
+# In settings.py
+AUTH_USER_MODEL = 'api.User'  # Ensure this is set correctly to your custom user model
 
 
 
 # JWT Settings
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=5),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
     "UPDATE_LAST_LOGIN": True,
 }
 
@@ -191,7 +205,7 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL':True,
     'SEND_CONFIRMATION_EMAIL':True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION':True,
-    'PASSWORD_RESET_CONFIRM_URL': 'password-reset/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'api/password_reset_confirm/{uid}/{token}',
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'TOKEN_MODEL': None,       # To Delete User Must Set it to None
@@ -203,19 +217,19 @@ DJOSER = {
     'EMAIL': {
         'activation': 'api.email.ActivationEmail',
         'confirmation': 'api.email.ConfirmationEmail',
-        'password_reset': 'api.email.PasswordResetEmail',
+        # 'password_reset_confirm': 'api.email.PasswordResetEmail',
         # 'password_changed': 'api.email.PasswordChangedConfirmationEmail',
     },
 
 
 }
 
-
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:61958/",   #frotend which port run add here
     "http://127.0.0.1:9000",
      "http://192.168.1.100",   # Use your machine's local IP address
     "http://198.168.1.2",
-    "http://localhost:51114/",
+    "http://localhost:56322/",
     
 ]
