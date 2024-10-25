@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
-
+from django.conf import settings
+from .views import DonationListView
+from django.conf.urls.static import static
 urlpatterns = [
     # URL pattern for bottom navigation items
     path('bottom-navigation-items/', views.bottom_navigation_items, name='bottom_navigation_items'),
@@ -9,18 +11,12 @@ urlpatterns = [
     path('categories/', views.all_categories, name='all_categories'),
 
     # URL pattern for donation projects
-    path('donations/', views.donation_projects, name='donation_projects'),
-
-    # URL pattern for donation project detail (single project)
-    path('donations/<uuid:project_id>/', views.donation_project_detail, name='donation_project_detail'),
+    path('donations/', DonationListView.as_view(), name='donation-list'),
 
     # URL pattern for working hours
     path('working-hours/', views.working_hours, name='working_hours'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
-
-from django.conf import settings
-from django.conf.urls.static import static
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

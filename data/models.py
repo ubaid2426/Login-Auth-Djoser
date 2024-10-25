@@ -51,6 +51,8 @@ class DonationModel(models.Model):
 
     date = models.DateField()  # Date of the donation/project
     position = models.IntegerField()  # Position to maintain order
+    # print(project_value);
+    # print(paid_value);
     @property
     def remaining_value(self):
         """Calculate remaining value of the donation project."""

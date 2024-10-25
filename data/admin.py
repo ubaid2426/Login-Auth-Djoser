@@ -26,7 +26,7 @@ class CategoryAdmin(admin.ModelAdmin):
 # Register DonationModel with Admin
 @admin.register(DonationModel)
 class DonationModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'project_value', 'paid_value', 'remaining_value', 'date', 'position')
+    list_display = ('title', 'project_value', 'paid_value', 'remaining_value', 'category', 'date', 'position')
     list_filter = ('date', 'position')
     search_fields = ('title', 'description')
     readonly_fields = ('remaining_value',)
