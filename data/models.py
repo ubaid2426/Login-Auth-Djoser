@@ -38,7 +38,12 @@ def get_default_category():
     return Category.objects.get_or_create(title="Uncategorized")[0].id
 
 
+class DonationOption(models.Model):
+    title = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return f"{self.title} - ${self.price}"
 
 class DonationModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique identifier
@@ -48,7 +53,7 @@ class DonationModel(models.Model):
     description = models.TextField()  # Description of the donation project
     project_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total project value with default
     paid_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Paid amount with default
-
+    # donation_options = models.ManyToManyField(DonationOption, blank=True, related_name='donation_projects')
     date = models.DateField()  # Date of the donation/project
     position = models.IntegerField()  # Position to maintain order
     # print(project_value);

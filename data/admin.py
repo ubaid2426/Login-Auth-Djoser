@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BottomNavigationItem, AllCategoryModel, Category, DonationModel, WorkingHours
+from .models import BottomNavigationItem, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption
 
 # Register BottomNavigationItem with Admin
 @admin.register(BottomNavigationItem)
@@ -21,7 +21,9 @@ class AllCategoryModelAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['title']
 
-
+@admin.register(DonationOption)
+class DonationOptionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'price']
 
 # Register DonationModel with Admin
 @admin.register(DonationModel)
