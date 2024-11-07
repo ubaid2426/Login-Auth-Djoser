@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import AllCategoryModel, DonationModel, BottomNavigationItem, WorkingHours
+from .models import AllCategoryModel, DonationModel, BottomNavigationItem, WorkingHours, DonationHistory
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializer import DonationSerializer 
 from django.db.models import F, ExpressionWrapper, DecimalField
 from rest_framework import status
 from django.db import models 
+from django.utils import timezone
+from decimal import Decimal
 # Bottom Navigation Items List
 def bottom_navigation_items(request):
     items = BottomNavigationItem.objects.all()
@@ -28,24 +30,32 @@ def get_image_url(image_field):
     return image_field.url if image_field else None
 
 
-
-# List View for Donation Projects
-# def donation_projects(request):
-#     projects = DonationModel.objects.all()
-#     data = [{
-#         "id": str(project.id),
-#         "title": project.title,
-#         "description": project.description,
-#         "project_value": project.project_value,
-#         "paid_value": project.paid_value,
-#         "remaining_value": project.remaining_value,
-#         "date": project.date,
-#         "image": get_image_url(project.image)  # Use the image URL function here
-#     } for project in projects]
+def record_donation(request):
+    donation_id = request.GET.get('donation_id')
+    donor_name = request.GET.get('donor_name')
+    amount = request.GET.get('amount')
     
-#     return JsonResponse(data, safe=False)
+    
+    if not donation_id or not donor_name or not amount:
+        return JsonResponse({'error': 'Missing required parameters.'}, status=400)
 
+    try:
+        amount = Decimal(amount)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid amount value.'}, status=400)
 
+    donation = get_object_or_404(DonationModel, id=donation_id)
+    donation.update_paid_value(amount)
+    DonationHistory.objects.create(
+        donation=donation,
+        donor_name=donor_name,
+        amount=amount,
+        date=timezone.now(),
+        image=donation.image,
+        payment_status='Pending'
+    )
+
+    return JsonResponse({'success': 'Donation recorded successfully.'})
 
 class DonationListView(APIView):
     def get(self, request):

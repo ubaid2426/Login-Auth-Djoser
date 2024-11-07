@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 import uuid
 # Create your models here.
 
@@ -62,18 +64,24 @@ class DonationModel(models.Model):
     def remaining_value(self):
         """Calculate remaining value of the donation project."""
         return self.project_value - self.paid_value
+    def update_paid_value(self, amount):
+        self.paid_value = amount + self.paid_value
+        self.save()
 
     def __str__(self):
         return f"{self.title} - {self.remaining_value} remaining"
 
-
-
-
-
-
-
-
-
+class DonationHistory(models.Model):
+    donation = models.ForeignKey(DonationModel, on_delete=models.CASCADE, related_name='history')
+    donor_name = models.CharField(max_length=255)  # You can adjust as per your user model
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateTimeField(default=timezone.now)
+    image = models.ImageField(upload_to='payment_images/', null=True, blank=True)
+    payment_status = models.CharField(
+        max_length=20,
+        choices=[('Pending', 'Pending'), ('Completed', 'Completed')],
+        default='Pending'
+    )
 
 
 

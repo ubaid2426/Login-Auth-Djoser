@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BottomNavigationItem, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption
+from .models import BottomNavigationItem, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption
 
 # Register BottomNavigationItem with Admin
 @admin.register(BottomNavigationItem)
@@ -40,3 +40,18 @@ class WorkingHoursAdmin(admin.ModelAdmin):
     list_display = ('title', 'days', 'friday')
     search_fields = ('title',)
 
+@admin.register(DonationHistory)
+class DonationHistoryAdmin(admin.ModelAdmin):
+    list_display = ('donation', 'donor_name', 'amount', 'date', 'payment_status', 'image')
+    list_filter = ('payment_status', 'date')
+    list_editable = ('payment_status',)  # Make payment_status editable in the list view
+    search_fields = ('donor_name', 'donation__title')
+    actions = ['mark_as_completed', 'mark_as_pending']
+
+    @admin.action(description='Mark selected donations as Completed')
+    def mark_as_completed(self, request, queryset):
+        queryset.update(payment_status='Completed')
+
+    @admin.action(description='Mark selected donations as Pending')
+    def mark_as_pending(self, request, queryset):
+        queryset.update(payment_status='Pending')
