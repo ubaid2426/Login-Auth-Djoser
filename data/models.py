@@ -58,8 +58,6 @@ class DonationModel(models.Model):
     # donation_options = models.ManyToManyField(DonationOption, blank=True, related_name='donation_projects')
     date = models.DateField()  # Date of the donation/project
     position = models.IntegerField()  # Position to maintain order
-    # print(project_value);
-    # print(paid_value);
     @property
     def remaining_value(self):
         """Calculate remaining value of the donation project."""
@@ -76,7 +74,11 @@ class DonationHistory(models.Model):
     donor_name = models.CharField(max_length=255)  # You can adjust as per your user model
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(default=timezone.now)
-    image = models.ImageField(upload_to='payment_images/', null=True, blank=True)
+    donor_id = models.IntegerField(null=True, blank=True)
+    Payment_image = models.ImageField(upload_to='payment_images/', null=True, blank=True)
+    image = models.ImageField(upload_to='category_images/', null=True, blank=True)
+    is_zakat = models.BooleanField(default=False, verbose_name="Zakat")
+    is_sadqah = models.BooleanField(default=False, verbose_name="Sadqah")
     payment_status = models.CharField(
         max_length=20,
         choices=[('Pending', 'Pending'), ('Completed', 'Completed')],

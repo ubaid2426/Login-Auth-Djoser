@@ -42,7 +42,7 @@ class WorkingHoursAdmin(admin.ModelAdmin):
 
 @admin.register(DonationHistory)
 class DonationHistoryAdmin(admin.ModelAdmin):
-    list_display = ('donation', 'donor_name', 'amount', 'date', 'payment_status', 'image')
+    list_display = ('donation', 'donor_name', 'donor_id', 'amount', 'is_zakat', 'is_sadqah', 'date', 'payment_status', 'Payment_image', 'image')
     list_filter = ('payment_status', 'date')
     list_editable = ('payment_status',)  # Make payment_status editable in the list view
     search_fields = ('donor_name', 'donation__title')

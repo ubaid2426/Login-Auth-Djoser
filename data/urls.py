@@ -16,6 +16,8 @@ urlpatterns = [
     # URL pattern for working hours
     path('working-hours/', views.working_hours, name='working_hours'),
     path('donor-history/', views.record_donation, name='record_donation'),
+    path('donor-history/<int:id>/update-status/', views.update_status, name='update_status'),
+    path('donor-history/<int:id>/status/', views.get_donation_status, name='get_donation_status'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

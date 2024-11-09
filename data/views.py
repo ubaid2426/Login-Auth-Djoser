@@ -1,5 +1,6 @@
+import json
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from .models import AllCategoryModel, DonationModel, BottomNavigationItem, WorkingHours, DonationHistory
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,13 +9,21 @@ from django.db.models import F, ExpressionWrapper, DecimalField
 from rest_framework import status
 from django.db import models 
 from django.utils import timezone
+from django.middleware.csrf import get_token
 from decimal import Decimal
+from django.views.decorators.csrf import csrf_exempt
+# import base64
+# from io import BytesIO
+# from django.core.files.base import ContentFile
 # Bottom Navigation Items List
 def bottom_navigation_items(request):
     items = BottomNavigationItem.objects.all()
     data = [{"disable_icon": item.disable_icon, "anable_icon": item.anable_icon, "label": item.label, "isSelected": item.isSelected} for item in items]
     return JsonResponse(data, safe=False)
-
+def my_view(request):
+    csrf_token = get_token(request)
+    print(csrf_token)
+    return HttpResponse("CSRF token generated!")
 
 # All Categories List
 def all_categories(request):
@@ -30,32 +39,106 @@ def get_image_url(image_field):
     return image_field.url if image_field else None
 
 
+@csrf_exempt
 def record_donation(request):
-    donation_id = request.GET.get('donation_id')
-    donor_name = request.GET.get('donor_name')
-    amount = request.GET.get('amount')
-    
-    
-    if not donation_id or not donor_name or not amount:
-        return JsonResponse({'error': 'Missing required parameters.'}, status=400)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
+    try:
+        # Parse JSON data from the request body
+        donor_id = request.POST.get('donor_id')
+        donor_name = request.POST.get('donor_name')
+        amount = request.POST.get('amount')
+        donation_title = request.POST.get('donation_title')
+        is_zakat = request.POST.get('is_zakat')
+        is_sadqah = request.POST.get('is_sadqah')
+        payment_image = request.FILES.get('payment_image')
+    except (json.JSONDecodeError, KeyError):
+        return JsonResponse({'error': 'Invalid JSON or missing required parameters.'}, status=400)
+
+    # Check for missing parameters
+    if not all([donor_name, amount, donation_title, payment_image]):
+        return JsonResponse({'error': 'Missing required parameters.'}, status=400)
+    # Convert amount to Decimal
+    def convert_to_bool(value):
+        if value.lower() == 'true':
+            return True
+        elif value.lower() == 'false':
+            return False
+        else:
+            raise ValueError("Invalid value for boolean conversion")
+    
+    try:
+        # Convert the string values to booleans
+        is_zakat = convert_to_bool(is_zakat)
+        is_sadqah = convert_to_bool(is_sadqah)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid is_zakat or is_sadqah value.'}, status=400)
+
+    # Convert amount to Decimal
     try:
         amount = Decimal(amount)
     except ValueError:
         return JsonResponse({'error': 'Invalid amount value.'}, status=400)
 
-    donation = get_object_or_404(DonationModel, id=donation_id)
+    # Get the donation object
+    donation = get_object_or_404(DonationModel, title=donation_title)
     donation.update_paid_value(amount)
+
+    # Create the DonationHistory record
     DonationHistory.objects.create(
         donation=donation,
         donor_name=donor_name,
+        is_zakat=is_zakat,
+        is_sadqah=is_sadqah,
+        donor_id=donor_id,
         amount=amount,
         date=timezone.now(),
+        Payment_image=payment_image,
         image=donation.image,
         payment_status='Pending'
     )
 
     return JsonResponse({'success': 'Donation recorded successfully.'})
+
+@csrf_exempt
+def update_status(request, id):
+    if request.method == 'POST':
+        new_status = request.POST.get('payment_status')
+        if new_status in ['Completed', 'Pending']:
+            try:
+                donation = DonationHistory.objects.get(id=id)
+                donation.payment_status = new_status
+                donation.save()
+                return JsonResponse({'success': 'Status updated successfully.'})
+            except DonationHistory.DoesNotExist:
+                return JsonResponse({'error': 'Donation record not found.'}, status=404)
+        else:
+            return JsonResponse({'error': 'Invalid status provided.'}, status=400)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+def get_donation_status(request, id):
+    # Retrieve all DonationHistory records for the donor_id
+    donations = DonationHistory.objects.filter(donor_id=id).order_by('-date')
+    # donation = get_object_or_404(DonationModel, title=donation_title)
+    if donations.exists():
+        # Return the latest payment status if only one status is needed
+        latest_donation = donations.first()
+        return JsonResponse({
+            # 'title': 
+            'donor_id': latest_donation.donor_id,
+            'payment_status': latest_donation.payment_status
+        })
+        
+        # Or, to return all records, uncomment the following and remove the code above
+        # return JsonResponse({
+        #     'donor_id': id,
+        #     'payment_statuses': [
+        #         {'date': donation.date, 'status': donation.payment_status} for donation in donations
+        #     ]
+        # })
+    else:
+        return JsonResponse({'error': 'No donation records found for this donor.'}, status=404)
 
 class DonationListView(APIView):
     def get(self, request):
