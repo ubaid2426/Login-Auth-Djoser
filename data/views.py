@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from .models import AllCategoryModel, DonationModel, BottomNavigationItem, WorkingHours, DonationHistory
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializer import DonationSerializer 
+from .serializer import DonationSerializer, DonationRequestSerializer, DonationHistorySerializer 
 from django.db.models import F, ExpressionWrapper, DecimalField
 from rest_framework import status
 from django.db import models 
@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.middleware.csrf import get_token
 from decimal import Decimal
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 # import base64
 # from io import BytesIO
 # from django.core.files.base import ContentFile
@@ -38,6 +39,20 @@ def get_image_url(image_field):
     """Return the URL of the image if it exists; otherwise, return None."""
     return image_field.url if image_field else None
 
+
+class DonationHistoryView(APIView):
+    def get(self, request, donor_id, donor_name):
+        # Fetch donation history records for the given donor ID and name
+        donation_history = DonationHistory.objects.filter(
+            donor_id=donor_id,
+            donor_name=donor_name
+        )
+
+        # Serialize the data
+        serializer = DonationHistorySerializer(donation_history, many=True)
+
+        # Return the serialized data
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @csrf_exempt
 def record_donation(request):
@@ -100,6 +115,17 @@ def record_donation(request):
     )
 
     return JsonResponse({'success': 'Donation recorded successfully.'})
+
+
+
+@api_view(['POST'])
+def create_donation_request(request):
+    serializer = DonationRequestSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @csrf_exempt
 def update_status(request, id):

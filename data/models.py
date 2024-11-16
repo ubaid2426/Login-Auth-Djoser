@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-
+from django.db import models
 import uuid
 # Create your models here.
 
@@ -87,6 +87,23 @@ class DonationHistory(models.Model):
 
 
 
+class DonationRequest(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    amount_required = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
+    street_address = models.CharField(max_length=255)
+    apartment = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    is_zakat = models.BooleanField(default=False)
+    is_sadqah = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.amount_required} (Zakat: {self.is_zakat}, Sadqah: {self.is_sadqah})"
+    
 class WorkingHours(models.Model):
     title = models.CharField(max_length=255)
     days = models.TextField()  # Use TextField for potentially longer descriptions

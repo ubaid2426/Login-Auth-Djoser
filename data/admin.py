@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BottomNavigationItem, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption
+from .models import BottomNavigationItem, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption, DonationRequest
 
 # Register BottomNavigationItem with Admin
 @admin.register(BottomNavigationItem)
@@ -39,6 +39,14 @@ class DonationModelAdmin(admin.ModelAdmin):
 class WorkingHoursAdmin(admin.ModelAdmin):
     list_display = ('title', 'days', 'friday')
     search_fields = ('title',)
+class DonationRequestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'amount_required', 'is_zakat', 'is_sadqah', 'created_at')
+    list_filter = ('is_zakat', 'is_sadqah', 'country', 'created_at')
+    search_fields = ('name', 'phone', 'city', 'country')
+
+admin.site.register(DonationRequest, DonationRequestAdmin)
+
+
 
 @admin.register(DonationHistory)
 class DonationHistoryAdmin(admin.ModelAdmin):
