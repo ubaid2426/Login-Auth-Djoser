@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BottomNavigationItem, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption, DonationRequest
+from .models import BottomNavigationItem, VideoPost, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption, DonationRequest
 
 # Register BottomNavigationItem with Admin
 @admin.register(BottomNavigationItem)
@@ -15,7 +15,10 @@ class AllCategoryModelAdmin(admin.ModelAdmin):
     search_fields = ('title', 'route')
     readonly_fields = ('id',)
 
-
+@admin.register(VideoPost)
+class VideoPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'created_at']
+    search_fields = ['title', 'description']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

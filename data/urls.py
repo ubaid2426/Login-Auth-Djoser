@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from django.conf import settings
-from .views import DonationListView, DonationHistoryView
+from .views import DonationListView, DonationHistoryView, VideoPostListCreateView, VideoPostDetailView
 from django.conf.urls.static import static
 urlpatterns = [
     # URL pattern for bottom navigation items
@@ -20,6 +20,8 @@ urlpatterns = [
     path('donor-history/<int:id>/status/', views.get_donation_status, name='get_donation_status'),
     path('donation-request/', views.create_donation_request, name='create_donation_request'),
     path('donation-history/<int:donor_id>/<str:donor_name>/', DonationHistoryView.as_view(), name='donation-history'),
+    path('videos/', VideoPostListCreateView.as_view(), name='video-list-create'),
+    path('videos/<int:pk>/', VideoPostDetailView.as_view(), name='video-detail'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

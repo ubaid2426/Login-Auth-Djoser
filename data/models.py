@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.db import models
 import uuid
+from decimal import Decimal
 # Create your models here.
 
 class BottomNavigationItem(models.Model):
@@ -63,6 +64,7 @@ class DonationModel(models.Model):
         """Calculate remaining value of the donation project."""
         return self.project_value - self.paid_value
     def update_paid_value(self, amount):
+        amount = Decimal(amount)
         self.paid_value = amount + self.paid_value
         self.save()
 
@@ -108,6 +110,17 @@ class WorkingHours(models.Model):
     title = models.CharField(max_length=255)
     days = models.TextField()  # Use TextField for potentially longer descriptions
     friday = models.TextField()  # Use TextField for potentially longer descriptions
+
+    def __str__(self):
+        return self.title
+
+
+
+class VideoPost(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    video = models.FileField(upload_to='videos/%y')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title

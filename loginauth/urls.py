@@ -22,8 +22,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('chat/', include('chatbot.urls')),
-    path('data/', include('data.urls'))
+    path('data/', include('data.urls')),
+    path('islam/', include('islam.urls')),
     # path('chat/', include('chatapp.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # urlpatterns += d(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

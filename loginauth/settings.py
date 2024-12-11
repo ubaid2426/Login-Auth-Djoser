@@ -13,11 +13,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-import dotenv
+# import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/data/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "data",
     "api",
     "chatbot",
+    'islam',
 ]
 
 MIDDLEWARE = [
@@ -96,7 +97,7 @@ WSGI_APPLICATION = 'loginauth.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "loginauth",
+        "NAME": "djoser",
         "USER": "ubaid",
         "PASSWORD": "ubaid123",
         "HOST": "127.0.0.1",
@@ -231,5 +232,4 @@ CORS_ALLOWED_ORIGINS = [
      "http://192.168.1.100",   # Use your machine's local IP address
     "http://198.168.1.2",
     "http://localhost:56322/",
-    
 ]
