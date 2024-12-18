@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BottomNavigationItem, VideoPost, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption, DonationRequest
+from .models import BottomNavigationItem, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationOption, DonationRequest
 
 # Register BottomNavigationItem with Admin
 @admin.register(BottomNavigationItem)
@@ -11,9 +11,10 @@ class BottomNavigationItemAdmin(admin.ModelAdmin):
 # Register AllCategoryModel with Admin
 @admin.register(AllCategoryModel)
 class AllCategoryModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'route', 'image')
+    list_display = ('id', 'category_id', 'title', 'route', 'image')
     search_fields = ('title', 'route')
     readonly_fields = ('id',)
+    # list_filter = ('category_id')
 
 @admin.register(VideoPost)
 class VideoPostAdmin(admin.ModelAdmin):
@@ -23,6 +24,9 @@ class VideoPostAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['title']
+@admin.register(CategorySelect)
+class CategorySelectAdmin(admin.ModelAdmin):
+    list_display = ['title']
 
 @admin.register(DonationOption)
 class DonationOptionAdmin(admin.ModelAdmin):
@@ -31,7 +35,7 @@ class DonationOptionAdmin(admin.ModelAdmin):
 # Register DonationModel with Admin
 @admin.register(DonationModel)
 class DonationModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'project_value', 'paid_value', 'remaining_value', 'category', 'date', 'position')
+    list_display = ('title', 'project_value', 'paid_value', 'remaining_value', 'category', 'category_select', 'date', 'position')
     list_filter = ('date', 'position')
     search_fields = ('title', 'description')
     readonly_fields = ('remaining_value',)

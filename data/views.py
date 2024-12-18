@@ -11,17 +11,11 @@ from .serializer import DonationSerializer, DonationRequestSerializer, DonationH
 from django.db.models import F, ExpressionWrapper, DecimalField
 from rest_framework import status
 from django.db.models import Sum, Count
-from django.db import models 
-# from ranged_fileresponse import RangedFileResponse
 from django.utils import timezone
 from django.middleware.csrf import get_token
 from decimal import Decimal
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
-# import base64
-# from io import BytesIO
-# from django.core.files.base import ContentFile
-# Bottom Navigation Items List
 def bottom_navigation_items(request):
     items = BottomNavigationItem.objects.all()
     data = [{"disable_icon": item.disable_icon, "anable_icon": item.anable_icon, "label": item.label, "isSelected": item.isSelected} for item in items]
@@ -43,21 +37,6 @@ def all_categories(request):
 def get_image_url(image_field):
     """Return the URL of the image if it exists; otherwise, return None."""
     return image_field.url if image_field else None
-
-
-# class DonationHistoryView(APIView):
-#     def get(self, request, donor_id, donor_name):
-#         # Fetch donation history records for the given donor ID and name
-#         donation_history = DonationHistory.objects.filter(
-#             donor_id=donor_id,
-#             donor_name=donor_name
-#         )
-
-#         # Serialize the data
-#         serializer = DonationHistorySerializer(donation_history, many=True)
-
-#         # Return the serialized data
-#         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class DonationHistoryView(APIView):
@@ -106,7 +85,7 @@ def record_donation(request):
         donation_titles = data.get('donation_title', [])
         is_zakat_list = data.get('is_zakat', [])
         is_sadqah_list = data.get('is_sadqah', [])
-        
+        # quantity=
         # Get the payment image file
         payment_image = request.FILES.get('payment_image')
 
@@ -117,6 +96,7 @@ def record_donation(request):
         # Process donations here
         for i, donation in enumerate(donations):
             amount = donation.get('amount', 0)
+            # quanti = donation.get('amount', 0)
             title = donation_titles[i].get('donation_title')
             is_zakat = is_zakat_list[i].get('isZakat', False)
             is_sadqah = is_sadqah_list[i].get('isSadqah', False)
@@ -130,6 +110,7 @@ def record_donation(request):
             DonationHistory.objects.create(
                 donation=donation,
                 donor_name=donor_name,
+                # quantity=quantity,
                 is_zakat=is_zakat,
                 is_sadqah=is_sadqah,
                 donor_id=donor_id,
@@ -139,8 +120,6 @@ def record_donation(request):
                 image=donation.image,
                 payment_status='Pending'
             )
-            # Update donation logic...
-            # For example, update the donation record and create history.
 
         return JsonResponse({'success': 'Donation recorded successfully.'})
     except (json.JSONDecodeError, KeyError, IndexError) as e:
@@ -220,21 +199,6 @@ def create_donation_request(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @csrf_exempt
-# def update_status(request, id):
-#     if request.method == 'POST':
-#         new_status = request.POST.get('payment_status')
-#         if new_status in ['Completed', 'Pending']:
-#             try:
-#                 donation = DonationHistory.objects.get(id=id)
-#                 donation.payment_status = new_status
-#                 donation.save()
-#                 return JsonResponse({'success': 'Status updated successfully.'})
-#             except DonationHistory.DoesNotExist:
-#                 return JsonResponse({'error': 'Donation record not found.'}, status=404)
-#         else:
-#             return JsonResponse({'error': 'Invalid status provided.'}, status=400)
-#     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 @csrf_exempt
 def update_status(request, id):
     if request.method == 'POST':
@@ -275,18 +239,70 @@ def get_donation_status(request, id):
     else:
         return JsonResponse({'error': 'No donation records found for this donor.'}, status=404)
 
+# class DonationListView(APIView):
+#     def get(self, request):
+#         try:
+#             # Get category from query parameters
+#             category = request.query_params.get('category', None)
+#             category_select = request.query_params.get('category_select', None)
+#             # Get all donations and filter by category if specified
+#             donations = DonationModel.objects.all()
+#             if category:
+#                 donations = donations.filter(category__title__iexact=category)
+#             if category_select:
+#                 donations = donations.filter(category_select__title__iexact=category_select)
+
+#             # Handle sorting and filtering options from query params
+#             sort_option = request.query_params.get('sort', None)
+#             filter_option = request.query_params.get('filter', None)
+
+#             if filter_option == 'finished':
+#                 donations = donations.filter(paid_value__gte=F('project_value'))
+#             elif filter_option == 'unfinished':
+#                 donations = donations.filter(paid_value__lt=F('project_value'))
+                
+#             if sort_option == 'oldest':
+#                 donations = donations.order_by('date')
+#             elif sort_option == 'newest':
+#                 donations = donations.order_by('-date')
+#             elif sort_option == 'remaining_low_to_high':
+#                 # Annotate with the remaining value
+#                 donations = donations.annotate(
+#                     remaining_value=ExpressionWrapper(
+#                         F('project_value') - F('paid_value'),
+#                         output_field=DecimalField()
+#                     )
+#                 ).order_by('remaining_value')
+#             elif sort_option == 'remaining_high_to_low':
+#                 donations = donations.annotate(
+#                     remaining_value=ExpressionWrapper(
+#                         F('project_value') - F('paid_value'),
+#                         output_field=DecimalField()
+#                     )
+#                 ).order_by('-remaining_value')
+
+#             # Serialize the data
+#             serializer = DonationSerializer(donations, many=True)
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+        
+#         except Exception as e:
+#             print(f"Error occurred: {e}")  # Log the error for debugging
+#             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class DonationListView(APIView):
     def get(self, request):
         try:
-            # Get category from query parameters
+            # Get query parameters
             category = request.query_params.get('category', None)
-            
-            # Get all donations and filter by category if specified
+            category_select = request.query_params.get('category_select', None)
+
+            # Get all donations and apply filters
             donations = DonationModel.objects.all()
             if category:
                 donations = donations.filter(category__title__iexact=category)
+            if category_select:
+                donations = donations.filter(category_select__title__iexact=category_select)
 
-            # Handle sorting and filtering options from query params
+            # Handle sorting and filtering options
             sort_option = request.query_params.get('sort', None)
             filter_option = request.query_params.get('filter', None)
 
@@ -300,7 +316,6 @@ class DonationListView(APIView):
             elif sort_option == 'newest':
                 donations = donations.order_by('-date')
             elif sort_option == 'remaining_low_to_high':
-                # Annotate with the remaining value
                 donations = donations.annotate(
                     remaining_value=ExpressionWrapper(
                         F('project_value') - F('paid_value'),
@@ -322,22 +337,6 @@ class DonationListView(APIView):
         except Exception as e:
             print(f"Error occurred: {e}")  # Log the error for debugging
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-# Detail View for Donation Project
-# def donation_project_detail(request, project_id):
-#     project = get_object_or_404(DonationModel, id=project_id)
-#     data = {
-#         "id": str(project.id),
-#         "title": project.title,
-#         "description": project.description,
-#         "project_value": project.project_value,
-#         "paid_value": project.paid_value,
-#         "remaining_value": project.remaining_value,
-#         "date": project.date,
-#         "image": get_image_url(project.image)  # Use the image URL function here
-#     }
-#     return JsonResponse(data)
-
 
 # Working Hours View
 def working_hours(request):

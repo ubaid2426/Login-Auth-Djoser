@@ -6,14 +6,7 @@ class DonationSerializer(serializers.ModelSerializer):
     # donation_options = DonationOptionSerializer(many=True)
     class Meta:
         model = DonationModel
-        fields = ['id', 'title', 'image', 'description', 'project_value', 'paid_value', 'category', 'date', 'position']
-
-
-# class DonationOptionSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = DonationOption
-#         fields = ['id', 'title', 'price']
-
+        fields = ['id', 'title', 'image', 'description', 'project_value', 'paid_value', 'category', 'category_select', 'date', 'position']
 
 class DonationRequestSerializer(serializers.ModelSerializer):
     class Meta:

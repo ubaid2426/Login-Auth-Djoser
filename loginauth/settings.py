@@ -94,14 +94,24 @@ WSGI_APPLICATION = 'loginauth.wsgi.application'
 
 # dotenv.load_dotenv()
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "djoser",
+#         "USER": "ubaid",
+#         "PASSWORD": "ubaid123",
+#         "HOST": "127.0.0.1",
+#         "PORT": "5432",
+#     }
+# }
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "djoser",
-        "USER": "ubaid",
-        "PASSWORD": "ubaid123",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Zakat',
+        'USER': 'ubaid',
+        'PASSWORD': 'ubaid123',
+        'HOST': '127.0.0.1',  # Default is 'localhost'
+        'PORT': '3306',  # Default is 3306
     }
 }
 
