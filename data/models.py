@@ -131,19 +131,20 @@ class DonationHistory(models.Model):
 
     def update_amount_or_quantity(self, amount=None, quantity=None):
         """
-        Updates either amount or quantity based on the frontend input.
-        If amount is provided, update amount and adjust quantity accordingly.
-        If quantity is provided, update quantity and adjust amount accordingly.
+        Updates either quantity or amount based on the provided input.
+        Priority is given to quantity. If quantity > 0, it updates quantity
+        and calculates the amount. Otherwise, it updates the amount and calculates quantity.
         """
-        if amount is not None:
+        if quantity and quantity > 0:  # Priority: Quantity
+            self.quantity = quantity
+            self.amount = Decimal(quantity) * (self.donation.project_value / self.donation.remaining_value)
+        elif amount and amount > 0:  # Fallback: Amount
             self.amount = amount
             if self.donation.project_value > 0:  # Prevent division by zero
                 self.quantity = int(amount / (self.donation.project_value / self.donation.remaining_value))
-        elif quantity is not None:
-            self.quantity = quantity
-            self.amount = Decimal(quantity) * (self.donation.project_value / self.donation.remaining_value)
         
-        self.save()    
+        self.save()
+
 
 
 class DonationRequest(models.Model):

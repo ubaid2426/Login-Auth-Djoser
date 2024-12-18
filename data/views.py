@@ -82,6 +82,7 @@ def record_donation(request):
         donor_id = data.get('donor_id')
         donor_name = data.get('donor_name')
         donations = data.get('donations', [])
+        donations1 = data.get('donations1', [])
         donation_titles = data.get('donation_title', [])
         is_zakat_list = data.get('is_zakat', [])
         is_sadqah_list = data.get('is_sadqah', [])
@@ -90,27 +91,32 @@ def record_donation(request):
         payment_image = request.FILES.get('payment_image')
 
         # Validate required fields
-        if not all([donor_id, donor_name, donations, donation_titles]):
+        if not all([donor_id, donor_name, donations, donations1, donation_titles]):
             return JsonResponse({'error': 'Missing required fields.'}, status=400)
 
         # Process donations here
         for i, donation in enumerate(donations):
             amount = donation.get('amount', 0)
-            # quanti = donation.get('amount', 0)
+            quantity = donations1[i].get('quantity', 0)
             title = donation_titles[i].get('donation_title')
             is_zakat = is_zakat_list[i].get('isZakat', False)
             is_sadqah = is_sadqah_list[i].get('isSadqah', False)
             print(amount);
+            print(quantity);
             print(title);
             print(is_zakat);
             print(is_sadqah);
             donation = get_object_or_404(DonationModel, title=title)
-            donation.update_paid_value(amount)
-    
+            # donation.update_paid_value(amount)
+            # donation.update_paid_value(quantity)
+            if quantity > 0:
+                donation.update_paid_value(quantity)
+            elif amount > 0:
+                donation.update_paid_value(amount)
             DonationHistory.objects.create(
                 donation=donation,
                 donor_name=donor_name,
-                # quantity=quantity,
+                quantity=quantity,
                 is_zakat=is_zakat,
                 is_sadqah=is_sadqah,
                 donor_id=donor_id,
