@@ -20,7 +20,6 @@ from decimal import Decimal
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
-# from django.contrib.auth.models import User
 def bottom_navigation_items(request):
     items = BottomNavigationItem.objects.all()
     data = [{"disable_icon": item.disable_icon, "anable_icon": item.anable_icon, "label": item.label, "isSelected": item.isSelected} for item in items]
