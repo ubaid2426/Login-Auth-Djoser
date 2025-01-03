@@ -290,36 +290,6 @@ def update_status(request, id):
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 
-# @csrf_exempt
-# def update_status(request, id):
-#     if request.method == 'POST':
-#         try:
-#             # Parse JSON payload
-#             data = json.loads(request.body)
-#             new_status = data.get('payment_status')
-
-#             # Validate status
-#             if new_status not in ['Pending', 'Completed']:
-#                 return JsonResponse({'error': 'Invalid status provided.'}, status=400)
-            
-#             # Update donation record
-#             donation = DonationHistory.objects.get(id=id)
-#             donation.payment_status = new_status
-#             donation.save()
-#             if payment.status == "pending":
-#                message = "Your payment is pending."
-#             elif payment.status == "complete":
-#                  message = "Your payment has been completed successfully."
-#             notification = Notification(user=payment.user, message=message)
-#             notification.save()
-#             return JsonResponse({'success': 'Status updated successfully.'})
-
-#         except DonationHistory.DoesNotExist:
-#             return JsonResponse({'error': 'Donation record not found.'}, status=404)
-#         except json.JSONDecodeError:
-#             return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
-
-#     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 def get_donation_status(request, id):
     # Retrieve all DonationHistory records for the donor_id
     donations = DonationHistory.objects.filter(donor_id=id).order_by('-date')

@@ -53,12 +53,6 @@ class NameAllah(models.Model):
 
 
 
-
-
-
-
-
-
 class Metadata(models.Model):
     length = models.CharField(max_length=2555, null=True)
     arabic_title = models.CharField(max_length=2555)
