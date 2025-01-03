@@ -1,20 +1,14 @@
 import json
 import os
-# from urllib import request
-# from django.apps import apps
 from django.shortcuts import render, get_object_or_404
 from django.http import FileResponse, HttpResponse, JsonResponse
 from rest_framework import generics
 from .models import BloodRequest
-# from .serializers import BloodRequestSerializer
 from api.models import User
 from loginauth import settings
 from .models import AllCategoryModel, IndividualCategory, Item, DonationModel, BottomNavigationItem, Notification, StaticCategory, WorkingHours, DonationHistory, VideoPost
 from rest_framework.views import APIView
 from django.http import StreamingHttpResponse, Http404
-from wsgiref.util import FileWrapper
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
 from rest_framework.response import Response
 from .serializer import DonationSerializer, BloodRequestSerializer, NotificationSerializer, ItemSerializer, DonationRequestSerializer, DonationHistorySerializer, VideoPostSerializer 
 from django.db.models import F, ExpressionWrapper, DecimalField
