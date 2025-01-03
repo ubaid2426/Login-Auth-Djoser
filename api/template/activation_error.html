@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head> -->
+    <title>Activation Failed</title>
+    {% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/activation_error.css' %}">
+    {% endblock %}
+<!-- </head>
+<body> -->
+    <div class="activation-error">
+        <h1>⚠️ Activation Failed</h1>
+        <p>The activation link is invalid or expired. Please try signing up again.</p>
+    </div>
+<!-- </body>
+</html> -->
+{% endblock %}

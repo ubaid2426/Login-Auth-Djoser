@@ -18,6 +18,7 @@
 {% block html_body %}
 <p>{% blocktrans %} You're receiving this email because you need to finish the activation process on {{ site_name }}.{% endblocktrans %}</p>
 
+<!-- <a href="{{ protocol }}://{{ domain }}/api/activation_confirm/{{ uid }}/{{ token }}/"  -->
 <p style="margin-bottom:100px">
     <a href="{{ protocol }}://{{ domain }}/api/auth/users/activation/{{ uid }}/{{ token }}/" 
        style="display: inline-block; padding: 10px 20px; background-color: red; color: white; text-decoration: none;">Activate Account</a>

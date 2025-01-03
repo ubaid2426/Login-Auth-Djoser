@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/activation_success.css' %}">
+{% endblock %}
+<div class="activation-success-container">
+  <div class="card">
+    <div class="card-header">
+      🎟️
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">🎉 Activation Successful!</h2>
+      <p class="card-text">
+        Congratulations! Your account has been successfully activated. 
+        You can now log in to your account and start exploring.
+      </p>
+      <!-- <a href="/login" class="login-button">Go to Login</a> -->
+    </div>
+  </div>
+</div>
+{% endblock %}

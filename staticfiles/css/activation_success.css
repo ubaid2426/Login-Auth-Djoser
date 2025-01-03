@@ -1,0 +1,73 @@
+/* Container for the activation card */
+.activation-success-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #f3f4f6, #e2e8f0);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+  }
+  
+  /* Card styling */
+  .card {
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    padding: 20px;
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+  
+  /* Card header (emoji area) */
+  .card-header {
+    font-size: 50px;
+    margin-bottom: 15px;
+  }
+  
+  /* Card title styling */
+  .card-title {
+    font-size: 1.5rem;
+    color: #1a202c;
+    margin: 10px 0;
+  }
+  
+  /* Card body text styling */
+  .card-text {
+    font-size: 1rem;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  /* Login button styling */
+  .login-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #3182ce;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-button:hover {
+    background-color: #2c5282;
+  }
+  
+  /* Keyframe animation for fade-in effect */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

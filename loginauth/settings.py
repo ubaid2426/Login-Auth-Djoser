@@ -18,7 +18,8 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/data/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-
+TIME_ZONE = 'Asia/Karachi'
+USE_TZ = True
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
 # STATIC_DIR=os.path.join(BASE_DIR,'static')
@@ -32,9 +33,9 @@ SECRET_KEY = 'django-insecure-h(87x(+08ulhszb(4ht=8+2o^%w89*y&y*#8m+-xr$o%r5%p='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2', '198.168.1.2']
+ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2', '198.168.1.2']
 # ALLOWED_HOSTS = [any_host]
-
+# ALLOWED_HOSTS = ['sadqahzakaat.com', 'www.sadqahzakaat.com']
 
 # Application definition
 
@@ -42,10 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'rest_framework_simplejwt',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'djoser',
     "data",
     "api",
@@ -54,6 +57,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'DjangoRangeMiddleware.middleware.RangesMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,6 +109,23 @@ WSGI_APPLICATION = 'loginauth.wsgi.application'
 #         "PORT": "5432",
 #     }
 # }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'sadqahzakaat_zakatapp',
+#         'USER': 'sadqahzakaat_zakatuser',
+#         'PASSWORD': 'zakatuser12345',
+#         'HOST': 'localhost',  # Default is 'localhost'
+#         'PORT': '3306',  # Default is 3306
+        #   'OPTIONS': {
+        #     'charset': 'utf8mb4',  # For MySQL
+        # },
+#     }
+# }
+
+DEFAULT_CHARSET = 'utf-8'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -120,8 +142,8 @@ DATABASES = {
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "rao242698@gmail.com"
-EMAIL_HOST_PASSWORD = 'pudckofoxwkgywsv'
+EMAIL_HOST_USER = "sadqahzakaat@gmail.com"
+EMAIL_HOST_PASSWORD = 'oxdsswfxheeuinvg'
 EMAIL_USE_TLS = True
 
 
@@ -149,12 +171,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_L10N = True
 
+# USE_TZ = True
+TIME_ZONE = 'Asia/Karachi'
 USE_TZ = True
 
 
@@ -165,7 +189,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -181,8 +205,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
 }
 
@@ -196,24 +220,20 @@ AUTH_USER_MODEL = 'api.User'  # Ensure this is set correctly to your custom user
 # JWT Settings
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365),
     # "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "UPDATE_LAST_LOGIN": True,
 }
-
-
-
-
-
 
 # Djoser Settings
 DJOSER = {
     'ACTIVATION_URL': 'activation/{uid}/{token}/',
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE':True,
-    'ACTIVATION_URL':'/activate/{uid}/{token}',
+    'ACTIVATION_URL':'auth/users/activation/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL':True,
+    'ACTIVATION_TOKEN_LIFESPAN': 3600,
     'SEND_CONFIRMATION_EMAIL':True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION':True,
     'PASSWORD_RESET_CONFIRM_URL': 'api/password_reset_confirm/{uid}/{token}',
@@ -222,24 +242,26 @@ DJOSER = {
     'TOKEN_MODEL': None,       # To Delete User Must Set it to None
     'SERIALIZERS':{
         'user_create': 'api.serializers.UserCreateSerializer',
-        'user': 'api.serializers.UserCreateSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
         'user_delete': 'djoser.serializers.UserDeleteSerializer',
     },
     'EMAIL': {
         'activation': 'api.email.ActivationEmail',
+        # 'activation': 'emails/activation_email.html',
         'confirmation': 'api.email.ConfirmationEmail',
-        # 'password_reset_confirm': 'api.email.PasswordResetEmail',
-        # 'password_changed': 'api.email.PasswordChangedConfirmationEmail',
+        'password_reset_confirm': 'api.email.PasswordResetEmail',
+        'password_changed': 'api.email.PasswordChangedConfirmationEmail',
     },
 
 
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:61958/",   #frotend which port run add here
-    "http://127.0.0.1:9000",
-     "http://192.168.1.100",   # Use your machine's local IP address
-    "http://198.168.1.2",
-    "http://localhost:56322/",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:61958/",   #frotend which port run add here
+#     "http://127.0.0.1:9000",
+#      "http://192.168.1.100",   # Use your machine's local IP address
+#     "http://198.168.1.2",
+#     "http://localhost:56322/",
+# ]
+
