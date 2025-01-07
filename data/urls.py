@@ -1,25 +1,17 @@
 from django.urls import path
 from . import views
-from rest_framework.routers import DefaultRouter
 from django.conf import settings
-from .views import DonationListView, BloodRequestListCreateView, BloodRequestDetailView, DonationHistoryView, NotificationDetailView, NotificationListCreateView, VideoPostListCreateView, VideoPostDetailView, ItemListView, ItemDetailView
+from .views import DonationListView, BloodRequestListCreateView, BloodRequestDetailView, DonationHistoryView, DonationView, NotificationDetailView, NotificationListCreateView, VideoPostListCreateView, VideoPostDetailView, ItemListView, ItemDetailView
 from django.conf.urls.static import static
-# router = DefaultRouter()
-# router.register(r'donation-options', DonationOptionsCategoryViewSet)
 urlpatterns = [
-    # URL pattern for bottom navigation items
     path('bottom-navigation-items/', views.bottom_navigation_items, name='bottom_navigation_items'),
-
-    # URL pattern for all categories
     path('categories/', views.all_categories, name='all_categories'),
     path('individualcategories/', views.individual_categories, name='individual_categories'),
     path('staticcategories/', views.static_categories, name='static_categories'),
-
-    # URL pattern for donation projects
+    path('donations/', DonationView.as_view(), name='donation-create'),
     path('donations/', DonationListView.as_view(), name='donation-list'),
     path('blood-requests/', BloodRequestListCreateView.as_view(), name='blood-requests-list-create'),
     path('blood-requests/<int:pk>/', BloodRequestDetailView.as_view(), name='blood-request-detail'),
-    # URL pattern for working hours
     path('working-hours/', views.working_hours, name='working_hours'),
     path('donor-history/', views.record_donation, name='record_donation'),
     path('donor-history/<int:id>/update-status/', views.update_status, name='update_status'),

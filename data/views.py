@@ -10,7 +10,7 @@ from .models import AllCategoryModel, IndividualCategory, Item, DonationModel, B
 from rest_framework.views import APIView
 from django.http import StreamingHttpResponse, Http404
 from rest_framework.response import Response
-from .serializer import DonationSerializer, BloodRequestSerializer, NotificationSerializer, ItemSerializer, DonationRequestSerializer, DonationHistorySerializer, VideoPostSerializer 
+from .serializer import IndividualDonorRequestSerializer, DonationSerializer, BloodRequestSerializer, NotificationSerializer, ItemSerializer, DonationRequestSerializer, DonationHistorySerializer, VideoPostSerializer 
 from django.db.models import F, ExpressionWrapper, DecimalField
 from rest_framework import status, generics
 from django.db.models import Sum, Count
@@ -28,7 +28,13 @@ def my_view(request):
     csrf_token = get_token(request)
     print(csrf_token)
     return HttpResponse("CSRF token generated!")
-
+class DonationView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = IndividualDonorRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # All Categories List
 def all_categories(request):
     categories = AllCategoryModel.objects.all()

@@ -120,7 +120,16 @@ class BloodRequest(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.blood_type}"
+class IndividualDonorRequest(models.Model):
+    name = models.CharField(max_length=255)
+    contact_number = models.CharField(max_length=15)
+    optional=models.CharField(max_length=255)
+    current_location = models.CharField(max_length=255)
+    donation_type = models.CharField(max_length=50)
+    amount = models.FloatField()
 
+    def __str__(self):
+        return f"{self.name} - {self.donation_type}"
 class DonationHistory(models.Model):
     donation = models.ForeignKey(DonationModel, on_delete=models.CASCADE, related_name='history')
     donor_name = models.CharField(max_length=255)  # You can adjust as per your user model

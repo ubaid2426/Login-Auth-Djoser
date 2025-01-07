@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DonationModel, DonationRequest, DonationHistory, Notification, VideoPost, Item
+from .models import IndividualDonorRequest, DonationModel, DonationRequest, DonationHistory, Notification, VideoPost, Item
 
 class DonationSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.title', read_only=True)
@@ -16,7 +16,10 @@ class BloodRequestSerializer(serializers.ModelSerializer):
         model = BloodRequest
         fields = ['id', 'name', 'contact_number', 'blood_type', 'distance_km', 'time_required', 'quantity', 'created_at']
 
-
+class IndividualDonorRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndividualDonorRequest
+        fields = ['id', 'name', 'contact_number', 'optional', 'current_location', 'donation_type', 'amount']
 
 # class DonationOptionsCategorySerializer(serializers.ModelSerializer):
 #     class Meta:

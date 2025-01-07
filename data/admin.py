@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BloodRequest, BottomNavigationItem, IndividualCategory, Item, Notification, StaticCategory, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationRequest
+from .models import BloodRequest, BottomNavigationItem, IndividualDonorRequest, IndividualCategory, Item, Notification, StaticCategory, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationRequest
 
 
 
@@ -111,3 +111,11 @@ class BloodRequestAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'contact_number', 'blood_type', 'distance_km', 'time_required', 'quantity', 'created_at']
     search_fields = ['name', 'blood_type']
     list_filter = ['blood_type', 'created_at']        
+
+
+
+
+@admin.register(IndividualDonorRequest)
+class IndividualDonorRequestAdmin(admin.ModelAdmin):
+    list_display = ['name', 'contact_number', 'current_location', 'donation_type', 'amount']
+    search_fields = ['name', 'contact_number', 'donation_type']
