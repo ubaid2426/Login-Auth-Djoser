@@ -74,6 +74,7 @@ class DonationModel(models.Model):
     category_select = models.ForeignKey(CategorySelect, on_delete=models.CASCADE, related_name='donationsselect', default=get_default_category)
     title = models.CharField(max_length=255)  # Title of the donation project
     description = models.TextField()  # Description of the donation project
+    title_notice=models.CharField(max_length=255, null=True)
     project_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # Total project value with default
     paid_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.0) 
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
@@ -96,7 +97,7 @@ class DonationModel(models.Model):
     def __str__(self):
         return f"{self.title} - {self.remaining_value} remaining"
 
-from django.db import models
+# from django.db import models
 
 class BloodRequest(models.Model):
     BLOOD_TYPES = [
@@ -123,7 +124,7 @@ class BloodRequest(models.Model):
 class IndividualDonorRequest(models.Model):
     name = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=15)
-    optional=models.CharField(max_length=255)
+    optional=models.CharField(max_length=255, null=True)
     current_location = models.CharField(max_length=255)
     donation_type = models.CharField(max_length=50)
     amount = models.FloatField()
@@ -184,6 +185,7 @@ class DonationRequest(models.Model):
     phone = models.CharField(max_length=15)
     amount_required = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
+    email=models.EmailField(max_length=255, null=True)
     street_address = models.CharField(max_length=255)
     apartment = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100)

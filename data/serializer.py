@@ -6,7 +6,7 @@ class DonationSerializer(serializers.ModelSerializer):
     # donation_options = DonationOptionSerializer(many=True)
     class Meta:
         model = DonationModel
-        fields = ['id', 'title', 'latitude', 'longitude', 'address', 'image', 'description', 'project_value', 'paid_value', 'category', 'category_select', 'date', 'position']
+        fields = ['id', 'title', 'title_notice', 'latitude', 'longitude', 'address', 'image', 'description', 'project_value', 'paid_value', 'category', 'category_select', 'date', 'position']
 
 # from rest_framework import serializers
 from .models import BloodRequest
@@ -32,7 +32,7 @@ class DonationRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DonationRequest
         fields = [
-            'name', 'phone', 'amount_required', 'description', 'street_address',
+            'name', 'phone', 'amount_required', 'description', 'street_address', "email",
             'apartment', 'city', 'state', 'country', 'is_zakat', 'is_sadqah', 'created_at'
         ]
 class ItemSerializer(serializers.ModelSerializer):

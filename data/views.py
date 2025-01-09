@@ -245,15 +245,16 @@ class VideoPostDetailView(APIView):
 @api_view(['POST'])
 def create_donation_request(request):
     serializer = DonationRequestSerializer(data=request.data)
-    data = json.loads(request.POST['data'])
-    email_user=data.get('email')
-    try:
-        user=User.objects.get(email=email_user)
-    except User.DoesNotExist:
-        raise ValidationError({"email": "User with this email doesn't exist"})
+    # data = json.loads(request.POST['data'])
+    # data = json.loads(request.POST['data'])
+    # email_user=data.get('email')
+    # try:
+    #     user=User.objects.get(email=email_user)
+    # except User.DoesNotExist:
+    #     raise ValidationError({"email": "User with this email doesn't exist"})
     if serializer.is_valid():
         serializer.save()
-        Notification.objects.create(user=user, message="Your donation request has been successfully processed and team will investigate on it.")
+        # Notification.objects.create(user=user, message="Your donation request has been successfully processed and team will investigate on it.")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

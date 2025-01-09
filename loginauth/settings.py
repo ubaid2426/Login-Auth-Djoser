@@ -119,13 +119,15 @@ WSGI_APPLICATION = 'loginauth.wsgi.application'
 #         'PASSWORD': 'zakatuser12345',
 #         'HOST': 'localhost',  # Default is 'localhost'
 #         'PORT': '3306',  # Default is 3306
-        #   'OPTIONS': {
-        #     'charset': 'utf8mb4',  # For MySQL
-        # },
+#           'OPTIONS': {
+#             'charset': 'utf8mb4',  # For MySQL
+#         },
 #     }
 # }
 
 DEFAULT_CHARSET = 'utf-8'
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

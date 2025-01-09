@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import BloodRequest, BottomNavigationItem, IndividualDonorRequest, IndividualCategory, Item, Notification, StaticCategory, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationRequest
-
+from django.utils.html import format_html
 
 
 
@@ -89,12 +89,17 @@ admin.site.register(DonationRequest, DonationRequestAdmin)
 
 @admin.register(DonationHistory)
 class DonationHistoryAdmin(admin.ModelAdmin):
-    list_display = ('donation', 'donor_name', 'donor_id', 'email', 'amount', 'is_zakat', 'is_sadqah', 'date', 'payment_status', 'Payment_image', 'image')
+    list_display = ('donation',  'donor_name', 'donor_id', 'email', 'amount', 'is_zakat', 'is_sadqah', 'date', 'payment_status', 'Payment_image', 'pay_view', 'image_view', 'heading_category', 'select_category', 'age', 'gender')
     list_filter = ('payment_status', 'date', 'email',)
     list_editable = ('payment_status',)  # Make payment_status editable in the list view
     search_fields = ('donor_name', 'donation__title')
     actions = ['mark_as_completed', 'mark_as_pending']
-
+    def image_view(self, obj):
+        return format_html(f"<img src='{obj.image.url}' width='100', />")
+    def pay_view(self, obj):
+        if obj.Payment_image:
+            return format_html(f"<img src='{obj.Payment_image.url}' width='100', />")
+        return "image not available"
     @admin.action(description='Mark selected donations as Completed')
     def mark_as_completed(self, request, queryset):
         queryset.update(payment_status='Completed')
