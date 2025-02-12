@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata
+from .models import DuaCard, EventCard, HadithCard, HolyPlace, HolyPlaceImage, Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata, VerseCard
 
 @admin.register(Surah)
 class SurahAdmin(admin.ModelAdmin):
@@ -19,7 +19,38 @@ class JuzInline(admin.TabularInline):
     model = Juz
     fields = ("index", "start_verse", "end_verse")
     extra = 1
+@admin.register(VerseCard)
+class VerseCardAdmin(admin.ModelAdmin):
+    list_display = ('id', 'reference', 'arabic_text', 'urdu_text')
+    # search_fields = ('reference', 'arabic_text', 'urdu_text')
+class HolyPlaceImageInline(admin.TabularInline):
+    model = HolyPlaceImage
+    extra = 1  # Allows adding multiple images at once
+    
+@admin.register(DuaCard)
+class DuaCardAdmin(admin.ModelAdmin):
+    list_display = ('reference', 'dua', 'arabic_text', 'urdu_text')
+    # search_fields = ('reference', 'dua', 'arabic_text', 'urdu_text')
+@admin.register(HolyPlace)
+class HolyPlaceAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'country', 'city', 'area', 'cover_image', 'latitude', 'longitude']
+    search_fields = ['title', 'description', 'category', 'country', 'city', 'area']
+    list_filter = ['country', 'city', 'area', 'category']
+    inlines = [HolyPlaceImageInline]  # Inline multiple images
 
+@admin.register(HolyPlaceImage)
+class HolyPlaceImageAdmin(admin.ModelAdmin):
+    list_display = ['holy_place', 'image']
+
+@admin.register(HadithCard)
+class HadithCardAdmin(admin.ModelAdmin):
+    list_display = ('reference', 'urdu_text')
+    # search_fields = ('reference', 'urdu_text')
+
+@admin.register(EventCard)
+class EventCardAdmin(admin.ModelAdmin):
+    list_display = ['urdu_text']
+    # search_fields = ('urdu_text')
 
 @admin.register(Surah1)
 class Surah1Admin(admin.ModelAdmin):

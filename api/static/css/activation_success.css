@@ -1,12 +1,13 @@
 /* Container for the activation card */
 .activation-success-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: start;
+    align-items: start;
     /* height: 100vh; */
     background: linear-gradient(135deg, #f3f4f6, #e2e8f0);
     font-family: 'Arial', sans-serif;
     margin: 0;
+    /* width: ; */
   }
   
   /* Card styling */

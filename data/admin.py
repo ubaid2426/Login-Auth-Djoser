@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BloodRequest, BottomNavigationItem, IndividualDonorRequest, IndividualCategory, Item, Notification, StaticCategory, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationRequest
+from .models import BloodRequest, BottomNavigationItem, DonationImage, IndividualDonorRequest, IndividualCategory, Item, Notification, StaticCategory, VideoPost, CategorySelect, DonationHistory, AllCategoryModel, Category, DonationModel, WorkingHours, DonationRequest
 from django.utils.html import format_html
 
 
@@ -23,8 +23,23 @@ class AllCategoryModelAdmin(admin.ModelAdmin):
     search_fields = ('title', 'route')
     readonly_fields = ('id',)
     ordering = ('category_id',)
-
-
+class DonationImageInline(admin.TabularInline):  
+    """Allow adding multiple images within a donation"""
+    model = DonationImage
+    extra = 1  # Shows an empty form to add more images
+# @admin.register(DonationImage)
+class DonationImageAdmin(admin.ModelAdmin):
+    list_display = ("donation", "image_preview")  # Show images in admin panel
+    
+    def image_preview(self, obj):
+        """Show image preview in admin panel."""
+        if obj.images:
+            return format_html(f"<img src='{obj.images.url}' width='100', />")
+            # return f'<img src="{obj.image.url}" width="50" height="50" />'
+        return "(No Image)"
+    
+    image_preview.allow_tags = True  # Allow HTML rendering in admin
+    image_preview.short_description = "Preview"
 @admin.register(StaticCategory)
 class StaticCategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'category_id', 'title', 'route', 'image')
@@ -67,11 +82,12 @@ class CategorySelectAdmin(admin.ModelAdmin):
 # Register DonationModel with Admin
 @admin.register(DonationModel)
 class DonationModelAdmin(admin.ModelAdmin):
-    list_display = ('title', 'project_value', 'paid_value', 'remaining_value', 'category', 'category_select', 'date', 'position')
+    list_display = ('project_id', 'title', 'project_value', 'paid_value', 'remaining_value', 'category', 'category_select', 'date', 'position')
     list_filter = ('date', 'position')
     search_fields = ('title', 'description')
     readonly_fields = ('remaining_value',)
     ordering = ('-date',)
+    inlines = [DonationImageInline] 
 
 # Register WorkingHours with Admin
 @admin.register(WorkingHours)
@@ -95,7 +111,9 @@ class DonationHistoryAdmin(admin.ModelAdmin):
     search_fields = ('donor_name', 'donation__title')
     actions = ['mark_as_completed', 'mark_as_pending']
     def image_view(self, obj):
-        return format_html(f"<img src='{obj.image.url}' width='100', />")
+        if obj.image:
+           return format_html(f"<img src='{obj.image.url}' width='100', />")
+        return "image not available"
     def pay_view(self, obj):
         if obj.Payment_image:
             return format_html(f"<img src='{obj.Payment_image.url}' width='100', />")

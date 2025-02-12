@@ -3,9 +3,12 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata
-from .serializers import SurahSerializer, Surah1Serializer, NameAllahSerializer, MetadataSerializer
-
+from rest_framework import viewsets
+from .models import Category, DuaCard, EventCard, HadithCard, HolyPlace, Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata, VerseCard
+from .serializers import DuaCardSerializer, EventCardSerializer, HadithCardSerializer, HolyPlaceSerializer, SurahSerializer, Surah1Serializer, NameAllahSerializer, MetadataSerializer, VerseCardSerializer
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 class SurahListView(APIView):
     def get(self, request):
         surahs = Surah.objects.all()
@@ -150,3 +153,101 @@ class UploadHadithData(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=400)
+        
+
+class VerseCardListCreateView(generics.ListCreateAPIView):
+    queryset = VerseCard.objects.all()
+    serializer_class = VerseCardSerializer
+
+# Retrieve and Update View
+class VerseCardRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = VerseCard.objects.all()
+    serializer_class = VerseCardSerializer
+
+
+class HadithCardListCreateView(generics.ListCreateAPIView):
+    queryset = HadithCard.objects.all()
+    serializer_class = HadithCardSerializer
+
+# Retrieve and Update View
+class HadithCardRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = HadithCard.objects.all()
+    serializer_class = HadithCardSerializer
+
+
+class EventCardListCreateView(generics.ListCreateAPIView):
+    queryset = EventCard.objects.all()
+    serializer_class = EventCardSerializer
+    
+
+# Retrieve and Update View
+class EventCardRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = EventCard.objects.all()
+    serializer_class = EventCardSerializer
+class DuaCardListCreateView(generics.ListCreateAPIView):
+    queryset = DuaCard.objects.all()
+    serializer_class = DuaCardSerializer
+
+# Retrieve and Update View
+class DuaCardRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = DuaCard.objects.all()
+    serializer_class = DuaCardSerializer
+
+# class HolyPlaceViewSet(viewsets.ModelViewSet):
+#     queryset = HolyPlace.objects.all()
+#     serializer_class = HolyPlaceSerializer
+#     filter_backends = [DjangoFilterBackend]
+#     filterset_fields = ['country', 'city', 'area', 'category']
+
+#     def create(self, request, *args, **kwargs):
+#         images = request.FILES.getlist('images')  # Get multiple images
+#         cover_image = request.FILES.get('cover_image')  # Get single image
+
+#         holy_place_serializer = self.get_serializer(data=request.data)
+#         if holy_place_serializer.is_valid():
+#             holy_place = holy_place_serializer.save(cover_image=cover_image)
+
+#             # Save multiple images
+#             for image in images:
+#                 HolyPlaceImage.objects.create(holy_place=holy_place, image=image)
+
+#             return Response(self.get_serializer(holy_place).data, status=status.HTTP_201_CREATED)
+#         return Response(holy_place_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HolyPlaceViewSet(viewsets.ModelViewSet):
+    queryset = HolyPlace.objects.all()
+    serializer_class = HolyPlaceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['country', 'city', 'area']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        category = self.request.query_params.get('category', None)
+        if category:
+            category_obj = get_object_or_404(Category, title=category)
+            queryset = queryset.filter(category=category_obj)
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        images = request.FILES.getlist('images')  # Multiple images
+        cover_image = request.FILES.get('cover_image')  # Single image
+
+        # Convert category title to category instance
+        category_title = request.data.get('category', None)
+        if category_title:
+            category_obj, _ = Category.objects.get_or_create(title=category_title)
+            request.data['category'] = category_obj.id  # Convert title to ID
+
+        holy_place_serializer = self.get_serializer(data=request.data)
+        if holy_place_serializer.is_valid():
+            holy_place = holy_place_serializer.save(cover_image=cover_image)
+
+            # Save multiple images
+            for image in images:
+                HolyPlaceImage.objects.create(holy_place=holy_place, image=image)
+
+            return Response(self.get_serializer(holy_place).data, status=status.HTTP_201_CREATED)
+        return Response(holy_place_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

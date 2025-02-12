@@ -1,9 +1,10 @@
 import json
 import os
+from urllib.parse import unquote
 from django.shortcuts import render, get_object_or_404
 from django.http import FileResponse, HttpResponse, JsonResponse
 from rest_framework import generics
-from .models import BloodRequest
+from .models import BloodRequest, DonationImage
 from api.models import User
 from loginauth import settings
 from .models import AllCategoryModel, IndividualCategory, Item, DonationModel, BottomNavigationItem, Notification, StaticCategory, WorkingHours, DonationHistory, VideoPost
@@ -65,11 +66,12 @@ def get_image_url(image_field):
 
 
 class DonationHistoryView(APIView):
-    def get(self, request, donor_id, donor_name):
+    def get(self, request, donor_id):
+        # donor_name1 = unquote(donor_name)
         # Fetch donation history records for the given donor ID and name
         donation_history = DonationHistory.objects.filter(
             donor_id=donor_id,
-            donor_name=donor_name
+            # donor_name=donor_name1
         )
 
         # Calculate totals and counts
@@ -77,6 +79,7 @@ class DonationHistoryView(APIView):
         total_donations = donation_history.count()
         zakat_count = donation_history.filter(is_zakat=True).count()
         sadqah_count = donation_history.filter(is_sadqah=True).count()
+    
 
         # Serialize the donation history data
         serializer = DonationHistorySerializer(donation_history, many=True)
@@ -93,6 +96,63 @@ class DonationHistoryView(APIView):
         # Return the serialized data
         return Response(response_data, status=status.HTTP_200_OK)
 
+
+
+
+
+class DonationHistory1View(APIView):
+    def get(self, request):
+        # Fetch all donation history records
+        donation_history = DonationHistory.objects.all()
+        donation_history1 = DonationModel.objects.all()
+
+        # Calculate totals and counts
+        total_amount = donation_history.aggregate(Sum('amount'))['amount__sum'] or 0
+        total_benefiter = donation_history1.aggregate(Sum('total_beneficieries'))['total_beneficieries__sum'] or 0
+        total_donations = donation_history.count()
+        zakat_count = donation_history.filter(is_zakat=True).count()
+        sadqah_count = donation_history.filter(is_sadqah=True).count()
+
+        # Fetch running and done projects
+        running_projects = DonationModel.objects.running_projects()
+        done_projects = DonationModel.objects.done_projects()
+
+        # Calculate project counts
+        project_counts = DonationModel.objects.all_project_counts()
+
+        # Serialize the donation history data
+        serializer = DonationHistorySerializer(donation_history, many=True)
+
+        # Prepare response data
+        response_data = {
+            "donation_history": serializer.data,  # All donation history data
+            "total_amount": total_amount,         # Total amount donated
+            "total_benefiter":total_benefiter,
+            "total_donations": total_donations,  # Total number of donations
+            "zakat_count": zakat_count,          # Total zakat donations count
+            "sadqah_count": sadqah_count,        # Total sadqah donations count
+            "total_projects_count": project_counts["running_count"] + project_counts["done_count"],
+            "running_project":project_counts["running_count"],
+            "done_project":project_counts["done_count"],
+            "running_projects": [
+                {
+                    "title": project.title,
+                    "remaining_value": project.remaining_value,
+                }
+                for project in running_projects
+            ],  # List of running projects with details
+            "done_projects": [
+                {
+                    "title": project.title,
+                    "total_value": project.project_value,
+                }
+                for project in done_projects
+            ],  # List of done projects with details
+            "total_projects_count": project_counts["running_count"] + project_counts["done_count"],    # Count of running and done projects
+        }
+
+        # Return the serialized data
+        return Response(response_data, status=status.HTTP_200_OK)
 @csrf_exempt
 def record_donation(request):
     if request.method != 'POST':
@@ -118,7 +178,7 @@ def record_donation(request):
         payment_image = request.FILES.get('payment_image')
 
         # Validate required fields
-        if not all([donor_id, donor_name, donations, donations1, email_user]):
+        if not all([donor_id, donor_name, payment_image,  donations, donations1, email_user]):
             return JsonResponse({'error': 'Missing required fields.'}, status=405)
         try:
             user=User.objects.get(email=email_user)
@@ -355,6 +415,27 @@ class DonationListView(APIView):
             print(f"Error occurred: {e}")  # Log the error for debugging
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+from rest_framework.parsers import MultiPartParser, FormParser
+
+class DonationCreateView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        donation_serializer = DonationSerializer(data=request.data)
+
+        if donation_serializer.is_valid():
+            donation = donation_serializer.save()
+            
+            # Save multiple images
+            images = request.FILES.getlist('images')  # Get multiple images
+            for image in images:
+                DonationImage.objects.create(donation=donation, images=image)
+
+            return Response(donation_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(donation_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 # Working Hours View
 def working_hours(request):
     working_hours = WorkingHours.objects.all()
@@ -372,7 +453,6 @@ class BloodRequestListCreateView(generics.ListCreateAPIView):
 class BloodRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BloodRequest.objects.all()
     serializer_class = BloodRequestSerializer
-
 class NotificationListCreateView(APIView):
     """
     List all notifications or create a new notification.
@@ -383,17 +463,30 @@ class NotificationListCreateView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = NotificationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        """
+        Create a new notification OR mark all notifications as seen.
+        If `seen=True` is sent in the request, mark all notifications as seen.
+        """
+        # ✅ If the request contains `seen: true`, only update existing notifications
+        if request.data.get("is_read") is True:
+            Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+            return Response({'message': 'All notifications marked as seen'}, status=status.HTTP_200_OK)
 
+        # ✅ If not, proceed with creating a new notification
+        serializer = NotificationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # ✅ Ensure user is set automatically
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class NotificationDetailView(APIView):
     """
     Retrieve, update, or delete a notification instance.
     """
     def get(self, request, pk):
+        """
+        Get a single notification by ID.
+        """
         try:
             notification = Notification.objects.get(pk=pk, user=request.user)
             serializer = NotificationSerializer(notification)
@@ -402,6 +495,9 @@ class NotificationDetailView(APIView):
             return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
 
     def put(self, request, pk):
+        """
+        Update a specific notification (e.g., mark as seen).
+        """
         try:
             notification = Notification.objects.get(pk=pk, user=request.user)
             serializer = NotificationSerializer(notification, data=request.data, partial=True)
@@ -413,9 +509,13 @@ class NotificationDetailView(APIView):
             return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk):
+        """
+        Delete a notification.
+        """
         try:
             notification = Notification.objects.get(pk=pk, user=request.user)
             notification.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Notification.DoesNotExist:
             return Response({'error': 'Notification not found'}, status=status.HTTP_404_NOT_FOUND)
+

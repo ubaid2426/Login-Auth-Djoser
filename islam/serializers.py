@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata
+from .models import DuaCard, EventCard, HadithCard, HolyPlace, HolyPlaceImage, Surah, Surah1, Verse, Juz, NameAllah, Hadith, Metadata, VerseCard
 
 class SurahSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,3 +63,56 @@ class MetadataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metadata
         fields = '__all__'
+
+
+class VerseCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VerseCard
+        fields = ['id', 'reference', 'arabic_text', 'urdu_text']
+        extra_kwargs = {
+            'reference': {'required': True},
+            'arabic_text': {'required': True},
+            'urdu_text': {'required': True},
+        }
+
+class HolyPlaceImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HolyPlaceImage
+        fields = ['id', 'image']
+
+class HolyPlaceSerializer(serializers.ModelSerializer):
+    images = HolyPlaceImageSerializer(many=True, read_only=True)  # Multiple images
+    cover_image = serializers.ImageField(required=False)  # Single image
+
+    class Meta:
+        model = HolyPlace
+        fields = ['id', 'title', 'description', 'category', 'cover_image', 'latitude', 'longitude', 'country', 'city', 'area', 'images']
+
+        
+class DuaCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DuaCard
+        fields = ['id', 'reference', 'dua', 'arabic_text', 'urdu_text']
+        extra_kwargs = {
+            'reference': {'required': True},
+            'dua': {'required': True},
+            'arabic_text': {'required': True},
+            'urdu_text': {'required': True},
+        }
+
+class HadithCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HadithCard
+        fields = ['id', 'reference', 'urdu_text']
+        extra_kwargs = {
+            'reference': {'required': True},
+            'urdu_text': {'required': True},
+        }
+
+class EventCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventCard
+        fields = ['id', 'urdu_text']
+        extra_kwargs = {
+            'urdu_text': {'required': True},
+        }

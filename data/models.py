@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.db import models
 import uuid
 from decimal import Decimal
-
+from django.db.models import F, Q, DecimalField, Sum
 from api.models import User
 # Create your models here.
 # from django.contrib.auth.models import User
@@ -65,10 +65,39 @@ def get_default_category1():
 
 def get_default_category():
     return Category.objects.get_or_create(title="Uncategorized")[0].id
+class DonationManager(models.Manager):
+    def running_projects(self):
+        """Return all projects that are still running."""
+        return self.filter(paid_value__lt=F('project_value'))
+
+    def done_projects(self):
+        """Return all projects that are completed."""
+        return self.filter(paid_value__gte=F('project_value'))
+    def all_project_counts(self):
+        """Return counts of running and done projects as a dictionary."""
+        running_count = self.running_projects().count()
+        done_count = self.done_projects().count()
+        return {
+            "running_count": running_count,
+            "done_count": done_count
+        }
+
+class DonationImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    donation = models.ForeignKey(
+        'DonationModel', 
+        on_delete=models.CASCADE, 
+        related_name='images'
+    )  # Links images to a donation
+    images = models.ImageField(upload_to='donation_images/')  # Upload path
+
+    def __str__(self):
+        return f"Image for {self.donation.title}"
 
 
 class DonationModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique identifier
+    project_id=models.IntegerField(null=True)
     image = models.ImageField(upload_to='category_images/', null=True, blank=True)  # Image field for storing category images
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='donations', default=get_default_category)
     category_select = models.ForeignKey(CategorySelect, on_delete=models.CASCADE, related_name='donationsselect', default=get_default_category)
@@ -79,12 +108,13 @@ class DonationModel(models.Model):
     paid_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.0) 
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True)
-    
+    total_beneficieries=models.DecimalField(max_digits=6, decimal_places=2, null=True)
     # The address of the location
     address = models.CharField(max_length=255, null=True, blank=True)     # Paid amount with default
     # donation_options = models.ManyToManyField(DonationOption, blank=True, related_name='donation_projects')
     date = models.DateField()  # Date of the donation/project
     position = models.IntegerField()  # Position to maintain order
+    objects = DonationManager()   #calculate how many project are runing and done 
     @property
     def remaining_value(self):
         """Calculate remaining value of the donation project."""

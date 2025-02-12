@@ -1,12 +1,20 @@
 from rest_framework import serializers
-from .models import IndividualDonorRequest, DonationModel, DonationRequest, DonationHistory, Notification, VideoPost, Item
+from .models import DonationImage, IndividualDonorRequest, DonationModel, DonationRequest, DonationHistory, Notification, VideoPost, Item
 
+
+
+
+class DonationImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DonationImage
+        fields = ['id', 'images']
 class DonationSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='category.title', read_only=True)
     # donation_options = DonationOptionSerializer(many=True)
+    images = DonationImageSerializer(many=True, read_only=True)
     class Meta:
         model = DonationModel
-        fields = ['id', 'title', 'title_notice', 'latitude', 'longitude', 'address', 'image', 'description', 'project_value', 'paid_value', 'category', 'category_select', 'date', 'position']
+        fields = ['id', 'project_id', 'title', 'images', 'title_notice', 'latitude', 'longitude', 'address', 'image', 'description', 'project_value', 'paid_value', 'category', 'category_select', 'date', 'position']
 
 # from rest_framework import serializers
 from .models import BloodRequest
@@ -43,12 +51,12 @@ class ItemSerializer(serializers.ModelSerializer):
 class DonationHistorySerializer(serializers.ModelSerializer):
 
     title = serializers.CharField(source="donation.title", read_only=True)
-    age = serializers.CharField(source="donation.title", read_only=True)
-    gender = serializers.CharField(source="gender_history", read_only=True)
-    headingcategory = serializers.CharField( read_only=True)
-    selectcategory = serializers.CharField( read_only=True)
-    image = serializers.ImageField(source="image_history", read_only=True)
-    email=serializers.EmailField(source="email_check", read_only=True)
+    age = serializers.CharField( read_only=True, default="")
+    gender = serializers.CharField( read_only=True, default="Unknown")
+    headingcategory = serializers.CharField( read_only=True, default="Unknown")
+    selectcategory = serializers.CharField( read_only=True, default="Unknown")
+    image = serializers.ImageField(source="donation.image", read_only=True, default=None)
+    email=serializers.EmailField( read_only=True)
     price = serializers.DecimalField(max_digits=10, decimal_places=2, source="amount")
     isZakat = serializers.BooleanField(source="is_zakat", read_only=True)
     isSadqah = serializers.BooleanField(source="is_sadqah", read_only=True)
@@ -74,3 +82,4 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+        extra_kwargs = {'user': {'read_only': True}}

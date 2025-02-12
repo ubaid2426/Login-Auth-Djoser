@@ -33,9 +33,9 @@ SECRET_KEY = 'django-insecure-h(87x(+08ulhszb(4ht=8+2o^%w89*y&y*#8m+-xr$o%r5%p='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2', '198.168.1.2']
+# ALLOWED_HOSTS = ['127.0.0.1', '10.0.2.2', '198.168.1.2']
 # ALLOWED_HOSTS = [any_host]
-# ALLOWED_HOSTS = ['sadqahzakaat.com', 'www.sadqahzakaat.com']
+ALLOWED_HOSTS = ['sadqahzakaat.com', 'www.sadqahzakaat.com']
 
 # Application definition
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'corsheaders',
     'djoser',
     "data",
@@ -111,33 +112,37 @@ WSGI_APPLICATION = 'loginauth.wsgi.application'
 # }
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'sadqahzakaat_zakatapp',
-#         'USER': 'sadqahzakaat_zakatuser',
-#         'PASSWORD': 'zakatuser12345',
-#         'HOST': 'localhost',  # Default is 'localhost'
-#         'PORT': '3306',  # Default is 3306
-#           'OPTIONS': {
-#             'charset': 'utf8mb4',  # For MySQL
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sadqahzakaat_zakatapp',
+        'USER': 'sadqahzakaat_zakatuser',
+        'PASSWORD': 'zakatuser12345',
+        'HOST': 'localhost',  # Default is 'localhost'
+        'PORT': '3306',  # Default is 3306
+          'OPTIONS': {
+            'charset': 'utf8mb4',  # For MySQL
+        },
+    }
+}
 
 DEFAULT_CHARSET = 'utf-8'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Zakat',
-        'USER': 'ubaid',
-        'PASSWORD': 'ubaid123',
-        'HOST': '127.0.0.1',  # Default is 'localhost'
-        'PORT': '3306',  # Default is 3306
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'Zakat',
+#         'USER': 'ubaid',
+#         'PASSWORD': 'ubaid123',
+#         'HOST': '127.0.0.1',  # Default is 'localhost'
+#         'PORT': '3306',  # Default is 3306
+#          'OPTIONS': {
+#             'charset': 'utf8mb4',
+#             'collation': 'utf8mb4_unicode_ci',
+#         },
+#     }
+# }
 
 
 
@@ -208,6 +213,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
 }
@@ -267,3 +273,4 @@ CORS_ORIGIN_ALLOW_ALL = True
 #     "http://localhost:56322/",
 # ]
 
+CORS_ALLOW_CREDENTIALS = True
